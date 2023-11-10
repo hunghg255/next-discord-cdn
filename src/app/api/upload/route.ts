@@ -1,6 +1,8 @@
 import axios from 'axios';
 import { NextResponse } from 'next/server';
 
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
 export const POST = async (request: Request) => {
   if (!process.env.WEBHOOK) {
     return NextResponse.json({ message: 'No WEBHOOK' });
@@ -13,15 +15,16 @@ export const POST = async (request: Request) => {
     return NextResponse.json({ message: 'No file' });
   }
 
-  // PNG, JPEG, WebP, GIF
+  // .jpg, .jpeg, .png, .webp, and .gif
   if (
     file.type !== 'image/png' &&
     file.type !== 'image/jpeg' &&
+    file.type !== 'image/jpg' &&
     file.type !== 'image/webp' &&
     file.type !== 'image/gif'
   ) {
     return NextResponse.json({
-      message: 'Invalid file type. Discord only allow PNG, JPEG, WebP, GIF',
+      message: 'Invalid file type. Discord only allow PNG, JPEG, JPG, WebP, GIF',
     });
   }
 
@@ -31,6 +34,8 @@ export const POST = async (request: Request) => {
       message: 'Invalid file size. Discord only allow smaller than 25MB',
     });
   }
+
+  await delay(2000);
 
   const r: any = await axios({
     method: 'post',
